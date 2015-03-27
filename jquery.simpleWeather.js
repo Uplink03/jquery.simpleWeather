@@ -10,6 +10,22 @@
     }
   }
 
+  function getTimeAsDate(t) {
+    var d = new Date();
+    var r = new Date(d.toDateString()+' '+t);
+
+    return r;
+  };
+
+  function getDayNight(result) {
+    var wpd = result.item.pubDate;
+    var n = wpd.indexOf(":");
+    var tpb = getTimeAsDate(wpd.substr(n-2,8));
+    var tsr = getTimeAsDate(result.astronomy.sunrise);
+    var tss = getTimeAsDate(result.astronomy.sunset);
+    return (tpb>tsr && tpb<tss)?'day':'night';
+  }
+
   $.extend({
     simpleWeather: function(options){
       options = $.extend({
@@ -63,6 +79,7 @@
             weather.link = result.item.link;
             weather.units = {temp: result.units.temperature, distance: result.units.distance, pressure: result.units.pressure, speed: result.units.speed};
             weather.wind = {chill: result.wind.chill, direction: compass[Math.round(result.wind.direction / 22.5)], speed: result.wind.speed};
+            weather.daynight = getDayNight(result);
 
             if(result.item.condition.temp < 80 && result.atmosphere.humidity < 40) {
               weather.heatindex = -42.379+2.04901523*result.item.condition.temp+10.14333127*result.atmosphere.humidity-0.22475541*result.item.condition.temp*result.atmosphere.humidity-6.83783*(Math.pow(10, -3))*(Math.pow(result.item.condition.temp, 2))-5.481717*(Math.pow(10, -2))*(Math.pow(result.atmosphere.humidity, 2))+1.22874*(Math.pow(10, -3))*(Math.pow(result.item.condition.temp, 2))*result.atmosphere.humidity+8.5282*(Math.pow(10, -4))*result.item.condition.temp*(Math.pow(result.atmosphere.humidity, 2))-1.99*(Math.pow(10, -6))*(Math.pow(result.item.condition.temp, 2))*(Math.pow(result.atmosphere.humidity,2));
@@ -74,8 +91,8 @@
               weather.thumbnail = image404;
               weather.image = image404;
             } else {
-              weather.thumbnail = "https://s.yimg.com/zz/combo?a/i/us/nws/weather/gr/"+result.item.condition.code+"ds.png";
-              weather.image = "https://s.yimg.com/zz/combo?a/i/us/nws/weather/gr/"+result.item.condition.code+"d.png";
+              weather.thumbnail = "http://l.yimg.com/a/i/us/nws/weather/gr/"+result.item.condition.code+weather.daynight[0]+"s.png";
+              weather.image = "http://l.yimg.com/a/i/us/nws/weather/gr/"+result.item.condition.code+weather.daynight[0]+".png";
             }
 
             weather.alt = {temp: getAltTemp(options.unit, result.item.condition.temp), high: getAltTemp(options.unit, result.item.forecast[0].high), low: getAltTemp(options.unit, result.item.forecast[0].low)};
@@ -94,8 +111,8 @@
                 forecast.thumbnail = image404;
                 forecast.image = image404;
               } else {
-                forecast.thumbnail = "https://s.yimg.com/zz/combo?a/i/us/nws/weather/gr/"+result.item.forecast[i].code+"ds.png";
-                forecast.image = "https://s.yimg.com/zz/combo?a/i/us/nws/weather/gr/"+result.item.forecast[i].code+"d.png";
+                forecast.thumbnail = "http://l.yimg.com/a/i/us/nws/weather/gr/"+result.item.forecast[i].code+"ds.png";
+                forecast.image = "http://l.yimg.com/a/i/us/nws/weather/gr/"+result.item.forecast[i].code+"d.png";
               }
 
               weather.forecast.push(forecast);
